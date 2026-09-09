@@ -1,0 +1,55 @@
+{
+  "name": "nosh-device-bridge",
+  "version": "0.1.0",
+  "description": "Universal JavaScript client for the Nosh Device Bridge — securely print ESC/POS receipts to a local thermal printer from any browser app or Node service.",
+  "type": "module",
+  "main": "./dist/nosh-device-bridge.cjs",
+  "module": "./src/index.js",
+  "browser": "./dist/nosh-device-bridge.cjs",
+  "unpkg": "./dist/nosh-device-bridge.cjs",
+  "jsdelivr": "./dist/nosh-device-bridge.cjs",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": "./dist/nosh-device-bridge.cjs",
+      "browser": "./dist/nosh-device-bridge.cjs",
+      "default": "./dist/nosh-device-bridge.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "dist",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "example:node": "node examples/node.mjs",
+    "test": "node examples/node.mjs"
+  },
+  "keywords": [
+    "nosh",
+    "device-bridge",
+    "escpos",
+    "thermal-printer",
+    "receipt",
+    "pos",
+    "point-of-sale",
+    "qz-tray",
+    "printing",
+    "websocket"
+  ],
+  "author": "Nosh",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "optionalDependencies": {
+    "ws": "^8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ghazniali95/nosh-device-bridge-package-js"
+  }
+}

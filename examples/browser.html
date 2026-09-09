@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nosh Device Bridge — browser example</title>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+    button { font: inherit; padding: 8px 14px; margin: 4px 4px 4px 0; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; }
+    pre { background: #f4f4f5; padding: 12px; border-radius: 8px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Nosh Device Bridge — browser demo</h1>
+  <p>Make sure the Nosh Device Bridge desktop app is running on this machine.</p>
+
+  <button id="connect">1. Connect</button>
+  <button id="pair">2. Pair (approve in app)</button>
+  <button id="list">3. Find printers</button>
+  <button id="print">4. Print receipt</button>
+
+  <pre id="out">ready…</pre>
+
+  <!-- Local file, or use a CDN:
+       <script src="https://unpkg.com/nosh-device-bridge"></script> -->
+  <script src="../dist/nosh-device-bridge.cjs"></script>
+  <script>
+    // Browser build exposes: window.DeviceBridge and window.NoshReceipt
+    const out = document.getElementById("out");
+    const log = (label, data) => { out.textContent += `\n${label}: ${JSON.stringify(data, null, 2)}`; };
+
+    const db = new DeviceBridge({ appName: "Browser Demo" });
+
+    document.getElementById("connect").onclick = async () => {
+      try { log("connected", await db.connect()); } catch (e) { log("error", e.message); }
+    };
+    document.getElementById("pair").onclick = async () => {
+      try {
+        const creds = await db.pair();          // user clicks Approve in the app
+        // Send creds.appId + creds.secret to your server to store securely.
+        log("paired", { appId: creds.appId });
+      } catch (e) { log("error", e.message); }
+    };
+    document.getElementById("list").onclick = async () => {
+      try { log("printers", await db.listPrinters()); } catch (e) { log("error", e.message); }
+    };
+    document.getElementById("print").onclick = async () => {
+      try {
+        const receipt = NoshReceipt.make()
+          .title("NOSH")
+          .item("Coffee", 1, "£2.50")
+          .total("TOTAL", "£2.50", true)
+          .footer("Thank you!")
+          .cut();
+        log("printed", await db.printReceipt(receipt, "127.0.0.1", 9100));
+      } catch (e) { log("error", e.message); }
+    };
+  </script>
+</body>
+</html>
