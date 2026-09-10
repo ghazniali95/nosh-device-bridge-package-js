@@ -6,10 +6,12 @@
   "main": "./dist/nosh-device-bridge.cjs",
   "module": "./src/index.js",
   "browser": "./dist/nosh-device-bridge.cjs",
+  "types": "./types/index.d.ts",
   "unpkg": "./dist/nosh-device-bridge.cjs",
   "jsdelivr": "./dist/nosh-device-bridge.cjs",
   "exports": {
     ".": {
+      "types": "./types/index.d.ts",
       "import": "./src/index.js",
       "require": "./dist/nosh-device-bridge.cjs",
       "browser": "./dist/nosh-device-bridge.cjs",
@@ -20,13 +22,15 @@
   "files": [
     "src",
     "dist",
+    "types",
     "examples",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
+    "test": "node --test test/smoke.test.mjs",
     "example:node": "node examples/node.mjs",
-    "test": "node examples/node.mjs"
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "nosh",
@@ -50,6 +54,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ghazniali95/nosh-device-bridge-package-js"
+    "url": "git+https://github.com/ghazniali95/nosh-device-bridge-package-js.git"
+  },
+  "homepage": "https://github.com/ghazniali95/nosh-device-bridge-package-js#readme",
+  "bugs": {
+    "url": "https://github.com/ghazniali95/nosh-device-bridge-package-js/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

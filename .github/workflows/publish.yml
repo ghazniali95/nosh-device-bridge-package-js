@@ -1,0 +1,82 @@
+name: Publish to npm
+
+# Publishes a new version to npm on every push to main that changes what ships
+# in the package.
+#
+# Versioning:
+#   - If package.json's version is NOT on npm yet (you bumped it yourself, e.g.
+#     to 0.2.0 or 1.0.0), that version is published as-is.
+#   - Otherwise the patch version is bumped automatically (0.1.0 -> 0.1.1),
+#     committed back to main with a vX.Y.Z tag, then published.
+#
+# The bot's version commit lands on main, so run `git pull` before your next push.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "dist/**"
+      - "types/**"
+      - "examples/**"
+      - "README.md"
+      - "LICENSE"
+      - "package.json"
+
+permissions:
+  contents: write # push the version-bump commit and tag
+  id-token: write # npm provenance / trusted publishing
+
+# One release at a time, never cancel one halfway through.
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main # latest main, including earlier bot version commits
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing (OIDC) needs npm >= 11.5.1
+      - run: npm install -g npm@latest
+
+      - run: npm test
+
+      - name: Pick version
+        id: version
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          CURRENT=$(node -p "require('./package.json').version")
+          PUBLISHED=$(npm view "$NAME@$CURRENT" version 2>/dev/null || true)
+          if [ -n "$PUBLISHED" ]; then
+            npm version patch --no-git-tag-version
+            echo "bumped=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          BUMPED: ${{ steps.version.outputs.bumped }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ "$BUMPED" = "true" ]; then
+            git commit -am "release: v$VERSION [skip ci]"
+          fi
+          git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null || git tag "v$VERSION"
+          git push --atomic origin HEAD:main "v$VERSION"
+
+      # Uses trusted publishing if configured on npmjs.com; otherwise falls back
+      # to the NPM_TOKEN repository secret.
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

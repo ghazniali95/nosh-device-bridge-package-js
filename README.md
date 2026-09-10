@@ -40,12 +40,11 @@ Pick the line that matches how you build your app. You only need **one**.
 ### Option A — npm / yarn / pnpm (Node, React, Vue, Next, bundlers)
 
 ```bash
-# Install straight from this GitHub repo (works today):
-npm install github:ghazniali95/nosh-device-bridge-package-js
-
-# …or, once it's published to the npm registry, the short form will be:
 npm install nosh-device-bridge
+# or: yarn add nosh-device-bridge  /  pnpm add nosh-device-bridge
 ```
+
+TypeScript types are included — no `@types` package needed.
 
 Then import it:
 
