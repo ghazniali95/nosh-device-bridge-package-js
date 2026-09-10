@@ -1,6 +1,6 @@
 {
   "name": "nosh-device-bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Universal JavaScript client for the Nosh Device Bridge — securely print ESC/POS receipts to a local thermal printer from any browser app or Node service.",
   "type": "module",
   "main": "./dist/nosh-device-bridge.cjs",
